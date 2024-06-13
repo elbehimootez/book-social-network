@@ -26,71 +26,32 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
-    private final EmailService emailService;
-    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final RoleRepository roleRepository;
+    private final EmailService emailService;
+    private final TokenRepository tokenRepository;
+
     @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
 
     public void register(RegistrationRequest request) throws MessagingException {
-         var userRole = roleRepository.findByName("USER")
-                 .orElseThrow(()-> new IllegalStateException("ROLE USER WAS NOT INITIALIZED"));
-
-         //create user object
-         var user = User.builder()
-                 .firstName(request.getFirstName())
-                 .lastName(request.getLastName())
-                 .email(request.getEmail())
-                 .password(passwordEncoder.encode(request.getPassword())) // must be encode
-                 .accountLocked(false)
-                 .enabled(false) //by default the account is not enabled
-                 .roles(List.of(userRole))
-                 .build();
-         //persist user object
-         userRepository.save(user);
-         sendValidationEmail(user);
-    }
-
-    private void sendValidationEmail(User user) throws MessagingException {
-        var newToken = generateAndSaveActivationToken(user);
-        //send email
-        emailService.sendEmail(
-                user.getEmail(),
-                user.fullName(),
-                EmailTemplateName.ACTIVATE_ACCOUNT,
-                activationUrl,
-                newToken,
-                "Account activation"
-        );
-    }
-
-    private String generateAndSaveActivationToken(User user) {
-        //generate token
-        String generatedToken = generateActivationCode(6);
-        var token = Token.builder()
-                .token(generatedToken)
-                .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusMinutes(15))
-                .user(user)
+        var userRole = roleRepository.findByName("USER")
+                // todo - better exception handling
+                .orElseThrow(() -> new IllegalStateException("ROLE USER was not initiated"));
+        var user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .accountLocked(false)
+                .enabled(false)
+                .roles(List.of(userRole))
                 .build();
-        tokenRepository.save(token);
-        return generatedToken;
-
-    }
-
-    private String generateActivationCode(int length) {
-        String characters = "0123456789";
-        StringBuilder codeBuilder= new StringBuilder();
-        SecureRandom secureRandom = new SecureRandom();
-        for(int i=0; i<length; i++){
-            int randomIndex = secureRandom.nextInt(characters.length()); //0..9
-            codeBuilder.append(characters.charAt(randomIndex));
-        }
-        return codeBuilder.toString();
+        userRepository.save(user);
+        sendValidationEmail(user);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -100,28 +61,73 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
+
         var claims = new HashMap<String, Object>();
-        var user = ((User)auth.getPrincipal());
-        claims.put("fullName", user.fullName());
-        var jwtToken = jwtService.generateToken(claims , user);
-;        return AuthenticationResponse.builder()
-                .token(jwtToken).build();
+        var user = ((User) auth.getPrincipal());
+        claims.put("fullName", user.getFullName());
+
+        var jwtToken = jwtService.generateToken(claims, (User) auth.getPrincipal());
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
     }
 
-    //@Transactional
+
     public void activateAccount(String token) throws MessagingException {
         Token savedToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid Token"));
-        if(LocalDateTime.now().isAfter(savedToken.getExpiresAt())){
+                // todo exception has to be defined
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+        if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
             sendValidationEmail(savedToken.getUser());
-            throw new RuntimeException("Acctivation token has expired. a new token has been sent to the same email adress");
+            throw new RuntimeException("Activation token has expired. A new token has been send to the same email address");
         }
+
         var user = userRepository.findById(savedToken.getUser().getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setEnabled(true);
         userRepository.save(user);
+
         savedToken.setValidateAt(LocalDateTime.now());
         tokenRepository.save(savedToken);
+    }
 
+    private String generateAndSaveActivationToken(User user) {
+        // Generate a token
+        String generatedToken = generateActivationCode(6);
+        var token = Token.builder()
+                .token(generatedToken)
+                .createdAt(LocalDateTime.now())
+                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                .user(user)
+                .build();
+        tokenRepository.save(token);
+
+        return generatedToken;
+    }
+
+    private void sendValidationEmail(User user) throws MessagingException {
+        var newToken = generateAndSaveActivationToken(user);
+
+        emailService.sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                EmailTemplateName.ACTIVATE_ACCOUNT,
+                activationUrl,
+                newToken,
+                "Account activation"
+        );
+    }
+
+    private String generateActivationCode(int length) {
+        String characters = "0123456789";
+        StringBuilder codeBuilder = new StringBuilder();
+
+        SecureRandom secureRandom = new SecureRandom();
+        for(int i=0; i<length; i++){
+            int randomIndex = secureRandom.nextInt(characters.length()); //0..9
+            codeBuilder.append(characters.charAt(randomIndex));
+        }
+
+        return codeBuilder.toString();
     }
 }

@@ -1,5 +1,6 @@
 package com.aymootez.book.handler;
 
+import com.aymootez.book.exception.ActivationTokenException;
 import com.aymootez.book.exception.OperationNotPermittedException;
 import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +71,6 @@ public class GlobalExceptionHandler {
                 );
     }
 
-  /*
     @ExceptionHandler(ActivationTokenException.class)
     public ResponseEntity<ExceptionResponse> handleException(ActivationTokenException exp) {
         return ResponseEntity
@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
-*/
+
     @ExceptionHandler(OperationNotPermittedException.class)
     public ResponseEntity<ExceptionResponse> handleException(OperationNotPermittedException exp) {
         return ResponseEntity
