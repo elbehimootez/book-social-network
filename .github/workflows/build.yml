@@ -40,7 +40,7 @@ jobs:
 
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.jar'
+          path: 'book-network/target/*.jar'
 
 
 
