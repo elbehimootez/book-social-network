@@ -27,6 +27,8 @@ jobs:
       - name: Navigate to project directory
         run: cd book-network
 
+      - name: Debug workspace
+        run: ls -la
 
       - name: Build with Maven
         run: mvn clean install
