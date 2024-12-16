@@ -23,15 +23,9 @@ jobs:
         with:
           java-version: '17'
 
-      # Naviguer vers le répertoire contenant le pom.xml
-      - name: Navigate to project directory
-        run: cd book-network
-
-      - name: Debug workspace
-        run: ls -la
 
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn -f book-network/pom.xml clean install
 
 
 
