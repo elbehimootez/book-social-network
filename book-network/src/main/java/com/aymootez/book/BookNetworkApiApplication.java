@@ -1,7 +1,7 @@
 package com.aymootez.book;
 
-import com.aymootez.book.role.Role;
-import com.aymootez.book.role.RoleRepository;
+import com.aymootez.book.models.entities.Role;
+import com.aymootez.book.repositories.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

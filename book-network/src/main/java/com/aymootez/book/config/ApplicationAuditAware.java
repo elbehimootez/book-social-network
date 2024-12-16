@@ -1,7 +1,7 @@
 package com.aymootez.book.config;
 
 
-import com.aymootez.book.user.User;
+import com.aymootez.book.models.entities.User;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
