@@ -1,4 +1,4 @@
-name: Build a JAR in spring boot using springboot
+name: Build a JAR from book netwrok back-end
 on:
   push:
     branches:
