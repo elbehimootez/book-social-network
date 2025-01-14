@@ -11,16 +11,22 @@ import java.nio.file.Path;
 @Slf4j
 public class FileUtils {
 
+    private FileUtils(){
+
+    }
+
     public static byte[] readFileFromLocation(String fileUrl) {
         if (StringUtils.isBlank(fileUrl)) {
-            return null;
+            return new byte[0];
         }
+
         try {
             Path filePath = new File(fileUrl).toPath();
             return Files.readAllBytes(filePath);
         } catch (IOException e) {
             log.warn("No file found in the path {}", fileUrl);
         }
-        return null;
+        return new byte[0];
     }
+
 }

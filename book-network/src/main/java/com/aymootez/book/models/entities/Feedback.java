@@ -10,13 +10,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Feedback extends BaseEntity {
+public class Feedback extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 2405172041950251807L;
 
     @Column
     private Double note; //1-5 stars

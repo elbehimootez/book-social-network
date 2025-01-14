@@ -1,8 +1,5 @@
 package com.aymootez.book.models.entities;
 
-import com.aymootez.book.models.entities.Book;
-import com.aymootez.book.models.entities.BookTransactionHistory;
-import com.aymootez.book.models.entities.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,7 +14,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 
@@ -71,7 +67,7 @@ public class User implements UserDetails, Principal {
         return this.roles
                 .stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.aymootez.book.models.entities;
 
 
-import com.aymootez.book.models.entities.User;
 import jakarta.persistence.*;
 import lombok.*;
 

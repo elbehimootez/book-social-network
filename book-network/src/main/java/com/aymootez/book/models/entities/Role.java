@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +19,8 @@ import java.util.List;
 @Entity
 @Table(name = "role")
 @EntityListeners(AuditingEntityListener.class)
-public class Role {
+public class Role implements Serializable {
+    private static final long serialVersionUID = 2405172041950251807L;
 
     @Id
     @GeneratedValue

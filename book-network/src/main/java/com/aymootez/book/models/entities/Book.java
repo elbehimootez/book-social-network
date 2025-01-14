@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
@@ -16,7 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Book extends BaseEntity {
+public class Book extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 2405172041950251807L;
 
     private String title;
     private String authorName;

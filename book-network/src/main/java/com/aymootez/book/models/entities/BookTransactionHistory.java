@@ -9,13 +9,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class BookTransactionHistory extends BaseEntity {
+public class BookTransactionHistory extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 2405172041950251807L;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -22,7 +22,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<?> register(
+    public ResponseEntity<RegistrationRequest> register(
             @RequestBody @Valid RegistrationRequest request
     ) throws MessagingException {
         service.register(request);

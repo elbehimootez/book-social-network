@@ -1,6 +1,8 @@
 package com.aymootez.book.services;
 
 import com.aymootez.book.email.EmailTemplateName;
+import com.aymootez.book.handlers.InvalidTokenException;
+import com.aymootez.book.handlers.TokenExpiredException;
 import com.aymootez.book.models.dtos.auth.AuthenticationRequest;
 import com.aymootez.book.models.dtos.auth.AuthenticationResponse;
 import com.aymootez.book.models.dtos.auth.RegistrationRequest;
@@ -43,7 +45,6 @@ public class AuthenticationService {
 
     public void register(RegistrationRequest request) throws MessagingException {
         var userRole = roleRepository.findByName("USER")
-                // todo - better exception handling
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initiated"));
         var user = User.builder()
                 .firstName(request.getFirstName())
@@ -79,11 +80,10 @@ public class AuthenticationService {
 
     public void activateAccount(String token) throws MessagingException {
         Token savedToken = tokenRepository.findByToken(token)
-                // todo exception has to be defined
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
+                .orElseThrow(() -> new InvalidTokenException("Invalid token"));
         if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
             sendValidationEmail(savedToken.getUser());
-            throw new RuntimeException("Activation token has expired. A new token has been send to the same email address");
+            throw new TokenExpiredException("Activation token has expired. A new token has been send to the same email address");
         }
 
         var user = userRepository.findById(savedToken.getUser().getId())
